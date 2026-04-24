@@ -57,7 +57,7 @@ jobs:
           SECRET_KEY: testsecretkey-for-ci-only
           ENVIRONMENT: test
         run: |
-          pytest --cov=app --cov-report=xml -v
+          PYTHONPATH=. pytest --cov=app --cov-report=xml -v
 
       - name: Upload coverage
         uses: codecov/codecov-action@v4
