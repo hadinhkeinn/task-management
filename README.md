@@ -43,7 +43,7 @@ If you want to run the development environment utilizing the specific developmen
 1. Ensure your `.env` file is set up.
 2. Run the following command to start the stack using `docker-compose.development.yml`:
    ```bash
-   docker-compose -f docker-compose.development.yml up -d --build
+   docker compose -f docker-compose.development.yml up -d --build
    ```
    This setup mounts your local configs and binds via the `env_file` mapping configured in the development setup.
 
