@@ -38,18 +38,14 @@ Includes JWT authentication, role-based access control, rate limiting, and struc
 
 ## How to Run the Project
 
-### Using Docker (Recommended)
-1. Clone the repository and configure your `.env` file as described above.
-2. Build and start the services:
+### Local Development with Docker Dev Environment
+If you want to run the development environment utilizing the specific development docker-compose file:
+1. Ensure your `.env` file is set up.
+2. Run the following command to start the stack using `docker-compose.development.yml`:
    ```bash
-   docker-compose up -d --build
+   docker-compose -f docker-compose.development.yml up -d --build
    ```
-   *The `migrate` container will run database migrations and exit. Once finished, the `api` container will serve the application.*
-3. Redeploying without stopping the database:
-   ```bash
-   ./redeploy.sh
-   # Or manually: docker compose up -d --build api migrate
-   ```
+   This setup mounts your local configs and binds via the `env_file` mapping configured in the development setup.
 
 ### Local Development Setup
 1. Create a virtual environment and install dependencies:
