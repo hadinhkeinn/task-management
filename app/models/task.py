@@ -1,8 +1,14 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
 from datetime import datetime
 from sqlalchemy import String, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 from app.db.base import Base
+
+if TYPE_CHECKING:
+    from app.models.user import User
 
 class Task(Base):
     __tablename__ = "tasks"
@@ -14,6 +20,3 @@ class Task(Base):
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
     
     owner: Mapped["User"] = relationship(back_populates="tasks")
-
-from app.models.user import User
-

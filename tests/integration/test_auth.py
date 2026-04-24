@@ -1,6 +1,5 @@
 import pytest
 from httpx import AsyncClient
-import pytest_asyncio
 
 @pytest.mark.asyncio
 async def test_register_login_refresh_cycle(async_client: AsyncClient):

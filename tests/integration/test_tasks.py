@@ -1,6 +1,5 @@
 import pytest
 from httpx import AsyncClient
-import pytest_asyncio
 
 @pytest.mark.asyncio
 async def test_full_tasks_crud_flow(async_client: AsyncClient, auth_headers):

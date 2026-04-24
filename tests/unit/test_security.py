@@ -1,9 +1,7 @@
 import pytest
 from datetime import timedelta
-from jose import jwt
 from fastapi import HTTPException
 from app.core.security import hash_password, verify_password, create_access_token, decode_token
-from app.core.config import settings
 
 def test_password_hashing():
     password = "secretpassword"
