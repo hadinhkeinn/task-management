@@ -13,7 +13,6 @@ README.md
 
 # Build/Dev scripts
 deploy.sh
-entrypoint.sh
 
 # Testing & Coverage
 tests/
