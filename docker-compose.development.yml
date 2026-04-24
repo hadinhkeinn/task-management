@@ -14,18 +14,6 @@ services:
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
 
-  migrate:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    command: alembic upgrade head
-    restart: "no"
-    env_file:
-      - .env
-    depends_on:
-      db:
-        condition: service_healthy
-
   api:
     build:
       context: .
@@ -36,8 +24,8 @@ services:
     env_file:
       - .env
     depends_on:
-      migrate:
-        condition: service_completed_successfully
+      db:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
