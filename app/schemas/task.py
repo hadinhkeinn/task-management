@@ -1,6 +1,7 @@
 from datetime import datetime
 from pydantic import BaseModel, ConfigDict, Field
-from typing import Literal
+from typing import Literal, Optional
+
 
 class TaskBase(BaseModel):
     title: str = Field(..., max_length=500, min_length=1)
@@ -9,8 +10,10 @@ class TaskBase(BaseModel):
 class TaskCreate(TaskBase):
     pass
 
-class TaskUpdate(TaskBase):
-    pass
+class TaskUpdate(BaseModel):
+    title: Optional[str] = Field(None, max_length=500, min_length=1)
+    status: Optional[Literal["todo", "doing", "done"]] = None
+
 
 class TaskOut(TaskBase):
     id: int

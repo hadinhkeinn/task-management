@@ -27,6 +27,24 @@ class TaskRepository(BaseRepository[Task]):
         
         return tasks, total
 
+    async def get_all_tasks_with_count(
+        self, page: int, limit: int, status: Optional[str] = None
+    ) -> Tuple[List[Task], int]:
+        query = select(Task)
+        if status:
+            query = query.filter(Task.status == status)
+            
+        total_query = select(func.count()).select_from(query.subquery())
+        total = await self.db.scalar(total_query) or 0
+        
+        offset = (page - 1) * limit
+        query = query.offset(offset).limit(limit)
+        
+        result = await self.db.execute(query)
+        tasks = list(result.scalars().all())
+        
+        return tasks, total
+
     async def get_by_id_and_user(self, *, id: int, user_id: int) -> Optional[Task]:
         query = select(Task).filter(Task.id == id, Task.user_id == user_id)
         result = await self.db.execute(query)

@@ -16,45 +16,53 @@ Includes JWT authentication, role-based access control, rate limiting, and struc
 - **Async-First Approach**: Utilized FastAPI, asyncpg, and SQLAlchemy 2.0 for non-blocking I/O, ensuring high throughput and concurrency.
 - **Layered Architecture**: The codebase is separated into distinct layers: routers (API entrypoints), services (business logic), repositories (data access), and schemas (Pydantic validation). This separation of concerns improves maintainability and testability.
 - **Stateless Authentication**: Chose JWT with short-lived access tokens and longer-lived refresh tokens instead of session-based auth to ensure scalability.
-- **Decoupled Database Migrations**: Alembic runs in its own ephemeral Docker container (`migrate`) to ensure schema changes are applied before the API service boots up safely.
+- **Database Migrations on Startup**: Alembic migrations execute automatically via an `entrypoint.sh` script before the API container fully starts, replacing the need for a separate migration container while guaranteeing schema validity.
+- **Role-Based Access Control (Admin Features)**: The system includes role-based access control with an Administrator role capable of managing users and overseeing all tasks across the platform.
 
-## Database Setup Instructions
-1. **Prerequisites**: Ensure you have PostgreSQL installed locally or use the provided Docker setup.
-2. **Environment Variables**:
-   Copy `.env.example` to `.env` and fill in your database credentials:
-   ```dotenv
-   POSTGRES_USER=postgres
-   POSTGRES_PASSWORD=postgres
-   POSTGRES_SERVER=localhost
-   POSTGRES_PORT=5432
-   POSTGRES_DB=taskdb
-   ```
-3. **Running Migrations**:
-   If running locally (without Docker), apply migrations using Alembic:
-   ```bash
-   alembic upgrade head
-   ```
-   *Note: When using Docker Compose, migrations are applied automatically on startup.*
+## Default Accounts
+A default admin account is seeded automatically upon applying database migrations:
+- **Email**: `admin@gmail.com`
+- **Password**: `Admin@123`
+- **Role**: `admin`
 
 ## How to Run the Project
 
-### Local Development with Docker Dev Environment
-If you want to run the development environment utilizing the specific development docker-compose file:
-1. Ensure your `.env` file is set up.
-2. Run the following command to start the stack using `docker-compose.development.yml`:
+### 1. Running with Docker Compose (Recommended)
+The easiest way to get the project up and running is by using Docker Compose. This will spin up both the FastAPI application and the PostgreSQL database.
+
+1. **Environment Setup**:
+   Copy the example environment file:
+   ```bash
+   cp .env.example .env
+   ```
+2. **Start the Application (Development)**:
+   This uses the dev compose file which mounts your local code for hot-reloading:
    ```bash
    docker compose -f docker-compose.development.yml up -d --build
    ```
-   This setup mounts your local configs and binds via the `env_file` mapping configured in the development setup.
+3. **Start the Application (Production)**:
+   For production deployment (without hot-reloading):
+   ```bash
+   docker compose up -d --build
+   ```
 
-### Local Development Setup
-1. Create a virtual environment and install dependencies:
+*Note: Database migrations are applied automatically when the API container starts.*
+
+### 2. Running Locally (Without Docker)
+If you prefer to run the Python application directly on your host machine:
+
+1. **Start a local PostgreSQL instance** and ensure your `.env` is configured to point to it (e.g., `POSTGRES_SERVER=localhost`).
+2. **Create a virtual environment** and install dependencies:
    ```bash
    python -m venv .venv
    source .venv/bin/activate
-   pip install -r requirements.txt # or 'poetry install' if using Poetry
+   poetry install
    ```
-2. Start the FastAPI development server:
+3. **Run Database Migrations** physically:
+   ```bash
+   alembic upgrade head
+   ```
+4. **Start the FastAPI server**:
    ```bash
    uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
    ```
@@ -88,6 +96,10 @@ SECRET_KEY=generate_a_secure_32_byte_string
 ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=15
 REFRESH_TOKEN_EXPIRE_DAYS=7
+
+# Admin Default Accounts
+ADMIN_EMAIL=admin_prod@yourdomain.com
+ADMIN_PASSWORD=str0ng_adm1n_p@ssw0rd
 
 # Set environment
 ENVIRONMENT=production
