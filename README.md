@@ -19,6 +19,34 @@ Includes JWT authentication, role-based access control, rate limiting, and struc
 - **Database Migrations on Startup**: Alembic migrations execute automatically via an `entrypoint.sh` script before the API container fully starts, replacing the need for a separate migration container while guaranteeing schema validity.
 - **Role-Based Access Control (Admin Features)**: The system includes role-based access control with an Administrator role capable of managing users and overseeing all tasks across the platform.
 
+## Database Schema
+
+```
+┌─────────────────────────┐       ┌─────────────────────────┐
+│         users           │       │         tasks           │
+├─────────────────────────┤       ├─────────────────────────┤
+│ id          PK  int     │──┐    │ id          PK  int     │
+│ email       UQ  varchar │  │    │ title           varchar │
+│ password        varchar │  ├───<│ user_id     FK  int     │
+│ role            varchar │  │    │ status          varchar │
+│ created_at      timestamp│  │    │ created_at      timestamp│
+└─────────────────────────┘  │    └─────────────────────────┘
+                             │
+                             │    ┌──────────────────────────┐
+                             │    │     refresh_tokens       │
+                             │    ├──────────────────────────┤
+                             │    │ id          PK  int      │
+                             │    │ token       UQ  varchar  │
+                             └───<│ user_id     FK  int      │
+                                  │ expires_at      timestamp│
+                                  │ created_at      timestamp│
+                                  └──────────────────────────┘
+```
+
+- **users**: Stores account credentials and roles (`user` or `admin`). One user can own many tasks and refresh tokens (cascade delete).
+- **tasks**: Each task belongs to a user via `user_id`. Status is one of `todo`, `doing`, or `done`.
+- **refresh_tokens**: Tracks JWT refresh tokens per user for token rotation and revocation.
+
 ## Default Accounts
 A default admin account is seeded automatically upon applying database migrations:
 - **Email**: `admin@gmail.com`
